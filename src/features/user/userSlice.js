@@ -13,6 +13,12 @@ export const loginWithEmail = createAsyncThunk(
         password,
       });
 
+      const { token } = response.data;
+
+      localStorage.setItem("token", token);
+
+      api.defaults.headers["authorization"] = "Bearer " + token;
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error.error);
