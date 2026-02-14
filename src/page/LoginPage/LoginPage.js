@@ -84,6 +84,13 @@ const Login = () => {
             </div>
           </div>
         </Form>
+        <div className="mt-3 text-align-center" style={{ fontSize: "14px" }}>
+          <strong>admin 테스트 계정</strong>
+          <br />
+          Email: test@test.com
+          <br />
+          Password: 1234
+        </div>
       </Container>
     </>
   );
