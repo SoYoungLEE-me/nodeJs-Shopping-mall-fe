@@ -6,7 +6,7 @@ import { initialCart } from "../cart/cartSlice";
 
 export const loginWithEmail = createAsyncThunk(
   "user/loginWithEmail",
-  async ({ email, password }, { rejectWithValue }) => {
+  async ({ email, password }, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.post("/user/login", {
         email,
@@ -15,9 +15,14 @@ export const loginWithEmail = createAsyncThunk(
 
       const { token } = response.data;
 
-      localStorage.setItem("token", token);
+      sessionStorage.setItem("token", token);
 
-      api.defaults.headers["authorization"] = "Bearer " + token;
+      dispatch(
+        showToastMessage({
+          message: "로그인 되었습니다.",
+          status: "success",
+        })
+      );
 
       return response.data;
     } catch (error) {
@@ -31,7 +36,12 @@ export const loginWithGoogle = createAsyncThunk(
   async (token, { rejectWithValue }) => {}
 );
 
-export const logout = () => (dispatch) => {};
+export const logout = () => (dispatch) => {
+  sessionStorage.removeItem("token");
+  dispatch(logoutSuccess());
+  dispatch(initialCart());
+};
+
 export const registerUser = createAsyncThunk(
   "user/registerUser",
   async (
@@ -67,7 +77,14 @@ export const registerUser = createAsyncThunk(
 
 export const loginWithToken = createAsyncThunk(
   "user/loginWithToken",
-  async (_, { rejectWithValue }) => {}
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/user/me");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.error);
+    }
+  }
 );
 
 const userSlice = createSlice({
@@ -83,6 +100,12 @@ const userSlice = createSlice({
     clearErrors: (state) => {
       state.loginError = null;
       state.registrationError = null;
+    },
+    logoutSuccess: (state) => {
+      state.user = null;
+      state.loginError = null;
+      state.registrationError = null;
+      state.success = false;
     },
   },
   extraReducers: (builder) => {
@@ -109,8 +132,11 @@ const userSlice = createSlice({
       .addCase(loginWithEmail.rejected, (state, action) => {
         state.loginError = action.payload;
         state.loading = false;
+      })
+      .addCase(loginWithToken.fulfilled, (state, action) => {
+        state.user = action.payload.user;
       });
   },
 });
-export const { clearErrors } = userSlice.actions;
+export const { clearErrors, logoutSuccess } = userSlice.actions;
 export default userSlice.reducer;
