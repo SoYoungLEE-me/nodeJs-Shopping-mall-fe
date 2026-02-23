@@ -74,6 +74,11 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
       return setStockError(true);
     }
 
+    if (stock.some((item) => Number(item[1]) < 0)) {
+      setStockError(true);
+      return;
+    }
+
     // 재고를 배열에서 객체로 바꿔주기
     const totalStock = stock.reduce((total, item) => {
       return { ...total, [item[0]]: parseInt(item[1]) };
@@ -120,9 +125,16 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
   };
 
   const handleStockChange = (value, index) => {
-    //재고 수량 변환하기
     const newStock = [...stock];
-    newStock[index][1] = value;
+
+    if (value === "") {
+      newStock[index][1] = "";
+      setStock(newStock);
+      return;
+    }
+    const n = Number(value);
+    newStock[index][1] = Number.isNaN(n) ? "" : Math.max(0, n);
+
     setStock(newStock);
   };
 
