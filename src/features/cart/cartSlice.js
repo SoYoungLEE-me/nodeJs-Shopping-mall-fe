@@ -26,6 +26,8 @@ export const addToCart = createAsyncThunk(
         showToastMessage({ message: "카트 추가 완료", status: "success" })
       );
 
+      dispatch(getCartList());
+
       return response.data.cartItemQty;
     } catch (error) {
       const errorMessage = error.response?.data?.error || "카트 추가 실패";
