@@ -29,21 +29,93 @@ const PaymentPage = () => {
     zip: "",
   });
 
+  const { cartList, totalPrice } = useSelector((state) => state.cart);
+  const user = useSelector((state) => state.user.user);
+
   useEffect(() => {
     // 오더번호를 받으면 어디로 갈까?
-  }, [orderNum]);
+    if (orderNum) {
+      navigate(`/order/${orderNum}`);
+    }
+  }, [orderNum, navigate]);
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
+    if (cartList.length === 0 && !firstLoading) {
+      navigate("/cart");
+    }
+  }, [cartList, firstLoading, navigate]);
+
+  useEffect(() => {
+    setFirstLoading(false);
+  }, []);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     // 오더 생성하기
+    if (cartList.length === 0) {
+      navigate("/cart");
+      return;
+    }
+
+    const { firstName, lastName, contact, address, city, zip } = shipInfo;
+
+    if (!firstName || !lastName || !contact || !address || !city || !zip) {
+      alert("배송 정보를 모두 입력해주세요.");
+      return;
+    }
+
+    if (!cardValue.number || !cardValue.expiry || !cardValue.cvc) {
+      alert("결제 정보를 입력해주세요.");
+      return;
+    }
+
+    dispatch(
+      createOrder({
+        totalPrice,
+        shipTo: { firstName, lastName, contact, address, city, zip },
+        contact: { firstName, lastName, contact },
+        orderList: cartList.map((item) => {
+          return {
+            productId: item.productId._id,
+            price: item.productId.price,
+            qty: item.qty,
+            size: item.size,
+          };
+        }),
+        paymentInfo: cardValue,
+      })
+    );
   };
 
   const handleFormChange = (event) => {
     //shipInfo에 값 넣어주기
+    const { name, value } = event.target;
+    setShipInfo({
+      ...shipInfo,
+      [name]: value,
+    });
   };
 
   const handlePaymentInfoChange = (event) => {
     //카드정보 넣어주기
+    const { name, value } = event.target;
+
+    let updatedValue = value;
+
+    if (name === "expiry") {
+      updatedValue = cc_expires_format(value);
+    }
+
+    setCardValue({
+      ...cardValue,
+      [name]: updatedValue,
+    });
   };
 
   const handleInputFocus = (e) => {
@@ -122,10 +194,15 @@ const PaymentPage = () => {
                   </Form.Group>
                 </Row>
                 <div className="mobile-receipt-area">
-                  {/* <OrderReceipt /> */}
+                  <OrderReceipt totalPrice={totalPrice} cartList={cartList} />
                 </div>
                 <div>
                   <h2 className="payment-title">결제 정보</h2>
+                  <PaymentForm
+                    cardValue={cardValue}
+                    handlePaymentInfoChange={handlePaymentInfoChange}
+                    handleInputFocus={handleInputFocus}
+                  />
                 </div>
 
                 <Button
@@ -140,7 +217,7 @@ const PaymentPage = () => {
           </div>
         </Col>
         <Col lg={5} className="receipt-area">
-          {/* <OrderReceipt  /> */}
+          <OrderReceipt totalPrice={totalPrice} cartList={cartList} />
         </Col>
       </Row>
     </Container>
