@@ -39,14 +39,20 @@ const CartProductCard = ({ item }) => {
           </div>
           <div>Size: {item.size}</div>
           <div>Total: ₩ {currencyFormat(item.productId.price * item.qty)}</div>
+
+          {item.insufficientStock && (
+            <div className="text-danger mt-1">
+              ⚠ 현재 재고는 {item.availableStock}개입니다.
+            </div>
+          )}
           <div>
             Quantity:
             <Form.Select
+              value={item.qty}
               onChange={(event) =>
-                handleQtyChange(item._id, event.target.value)
+                handleQtyChange(item._id, Number(event.target.value))
               }
               required
-              defaultValue={item.qty}
               className="qty-dropdown"
             >
               <option value={1}>1</option>

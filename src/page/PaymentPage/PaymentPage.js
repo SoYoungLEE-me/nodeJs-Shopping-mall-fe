@@ -7,6 +7,7 @@ import PaymentForm from "./component/PaymentForm";
 import "./style/paymentPage.style.css";
 import { cc_expires_format } from "../../utils/number";
 import { createOrder } from "../../features/order/orderSlice";
+import { getCartList } from "../../features/cart/cartSlice";
 
 const PaymentPage = () => {
   const dispatch = useDispatch();
@@ -31,13 +32,6 @@ const PaymentPage = () => {
 
   const { cartList, totalPrice } = useSelector((state) => state.cart);
   const user = useSelector((state) => state.user.user);
-
-  useEffect(() => {
-    // 오더번호를 받으면 어디로 갈까?
-    if (orderNum) {
-      navigate(`/order/${orderNum}`);
-    }
-  }, [orderNum, navigate]);
 
   useEffect(() => {
     if (!user) {
@@ -75,22 +69,27 @@ const PaymentPage = () => {
       return;
     }
 
-    dispatch(
-      createOrder({
-        totalPrice,
-        shipTo: { firstName, lastName, contact, address, city, zip },
-        contact: { firstName, lastName, contact },
-        orderList: cartList.map((item) => {
-          return {
-            productId: item.productId._id,
-            price: item.productId.price,
-            qty: item.qty,
-            size: item.size,
-          };
-        }),
-        paymentInfo: cardValue,
-      })
-    );
+    try {
+      dispatch(
+        createOrder({
+          totalPrice,
+          shipTo: { firstName, lastName, contact, address, city, zip },
+          contact: { firstName, lastName, contact },
+          orderList: cartList.map((item) => {
+            return {
+              productId: item.productId._id,
+              price: item.productId.price,
+              qty: item.qty,
+              size: item.size,
+            };
+          }),
+          paymentInfo: cardValue,
+        })
+      ).unwrap();
+      navigate("/payment/success");
+    } catch (error) {
+      console.error("주문 실패:", error);
+    }
   };
 
   const handleFormChange = (event) => {

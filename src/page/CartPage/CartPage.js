@@ -25,6 +25,8 @@ const CartPage = () => {
     }
   }, [dispatch, user]);
 
+  const hasStockIssue = cartList.some((item) => item.insufficientStock);
+
   return (
     <Container>
       <Row>
@@ -41,7 +43,11 @@ const CartPage = () => {
           )}
         </Col>
         <Col xs={12} md={5}>
-          <OrderReceipt totalPrice={totalPrice} cartList={cartList} />
+          <OrderReceipt
+            totalPrice={totalPrice}
+            cartList={cartList}
+            hasStockIssue={hasStockIssue}
+          />
         </Col>
       </Row>
     </Container>

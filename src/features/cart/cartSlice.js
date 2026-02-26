@@ -94,6 +94,8 @@ export const updateQty = createAsyncThunk(
         throw new Error(response.error);
       }
 
+      dispatch(getCartList());
+
       return { id, qty: value };
     } catch (error) {
       const errorMessage = error.response?.data?.error || "수량 변경 실패";
