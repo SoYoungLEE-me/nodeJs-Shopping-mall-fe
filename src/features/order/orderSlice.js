@@ -41,17 +41,67 @@ export const createOrder = createAsyncThunk(
 
 export const getOrder = createAsyncThunk(
   "order/getOrder",
-  async (_, { rejectWithValue, dispatch }) => {}
+  async (_, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await api.get("/order/me");
+
+      if (response.status !== 200) {
+        throw new Error("주문 조회 실패");
+      }
+
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || "주문 조회 실패");
+    }
+  }
 );
 
 export const getOrderList = createAsyncThunk(
   "order/getOrderList",
-  async (query, { rejectWithValue, dispatch }) => {}
+  async (query, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/order", {
+        params: query,
+      });
+
+      if (response.status !== 200) {
+        throw new Error("주문 조회 실패");
+      }
+
+      return {
+        data: response.data.data,
+        totalPageNum: response.data.totalPageNum,
+      };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || "주문 조회 실패");
+    }
+  }
 );
 
 export const updateOrder = createAsyncThunk(
   "order/updateOrder",
-  async ({ id, status }, { dispatch, rejectWithValue }) => {}
+  async ({ id, status }, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await api.put(`/order/${id}`, { status });
+
+      if (response.status !== 200) {
+        throw new Error("상태 변경 실패");
+      }
+
+      dispatch(getOrderList());
+
+      dispatch(
+        showToastMessage({
+          message: "주문 상태가 변경되었습니다",
+          status: "success",
+        })
+      );
+
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || "상태 변경 실패");
+    }
+  }
 );
 
 // Order slice
@@ -74,6 +124,30 @@ const orderSlice = createSlice({
         state.orderNum = action.payload;
       })
       .addCase(createOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getOrder.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orderList = action.payload;
+        state.error = "";
+      })
+      .addCase(getOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getOrderList.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getOrderList.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orderList = action.payload.data;
+        state.totalPageNum = action.payload.totalPageNum;
+      })
+      .addCase(getOrderList.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

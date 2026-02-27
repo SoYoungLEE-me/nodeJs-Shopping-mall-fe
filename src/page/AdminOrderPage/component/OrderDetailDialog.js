@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Modal, Button, Col, Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { ORDER_STATUS } from "../../../constants/order.constants";
@@ -9,6 +9,10 @@ const OrderDetailDialog = ({ open, handleClose }) => {
   const selectedOrder = useSelector((state) => state.order.selectedOrder);
   const [orderStatus, setOrderStatus] = useState(selectedOrder.status);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    setOrderStatus(selectedOrder?.status);
+  }, [selectedOrder]);
 
   const handleStatusChange = (event) => {
     setOrderStatus(event.target.value);
@@ -69,7 +73,12 @@ const OrderDetailDialog = ({ open, handleClose }) => {
             </tbody>
           </Table>
         </div>
-        <Form onSubmit={submitStatus}>
+        <Form
+          onSubmit={(e) => {
+            e.preventDefault();
+            submitStatus();
+          }}
+        >
           <Form.Group as={Col} controlId="status">
             <Form.Label>Status</Form.Label>
             <Form.Select value={orderStatus} onChange={handleStatusChange}>
