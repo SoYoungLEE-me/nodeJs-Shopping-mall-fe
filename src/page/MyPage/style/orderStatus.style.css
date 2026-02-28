@@ -1,54 +1,90 @@
-.status-card{
-    background-color: white;
-    padding:10px;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-    margin-bottom: 20px;
-}
-.status-card:hover{
-    background-color: rgba(238, 30, 30, 0.148);
-}
-.vertical-middle{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-.status-card-container{
-    margin-bottom: 20px;
-    max-width: 750px;
-   
+.status-card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+  transition: all 0.25s ease;
 }
 
-
-
-
-.order-button-area{
-    margin-top: 20px;
-    display: flex;
-    justify-content: flex-end;
-}
-.order-button-area button{
-    margin-left: 20px;
+.status-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
 }
 
-.text-align-center{
-    text-align: center;
-    margin-bottom: 5px;
-}
-.text-12{
-    font-size: 12px;
-
+.order-image-wrapper {
+  width: 100%;
+  height: 100px;
+  overflow: hidden;
+  border-radius: 10px;
 }
 
-.no-order-box{
-    background-color: white;
-    text-align: center;
-    padding:20px
+.order-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-@media screen and (max-width: 63rem) {
-   .order-info{
-    margin-left: 20px;
-    }
+.order-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+
+.order-num {
+  font-weight: 600;
+}
+
+.product-name {
+  font-weight: 500;
+}
+
+.price {
+  font-weight: 700;
+}
+
+.status-area {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.vertical-middle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.text-align-center {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.text-12 {
+  font-size: 12px;
+}
+
+.no-order-box {
+  background-color: white;
+  text-align: center;
+  padding: 40px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  margin-top: 40px;
+}
+
+@media screen and (max-width: 768px) {
+  .status-card {
+    padding: 16px;
   }
 
-  
+  .order-image-wrapper {
+    height: 120px;
+  }
+
+  .status-area {
+    margin-top: 10px;
+  }
+}

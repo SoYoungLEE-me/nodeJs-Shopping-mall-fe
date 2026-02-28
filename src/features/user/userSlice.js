@@ -33,7 +33,28 @@ export const loginWithEmail = createAsyncThunk(
 
 export const loginWithGoogle = createAsyncThunk(
   "user/loginWithGoogle",
-  async (token, { rejectWithValue }) => {}
+  async (googleToken, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await api.post("/user/google", {
+        token: googleToken,
+      });
+
+      const { user, token } = response.data;
+
+      sessionStorage.setItem("token", token);
+
+      dispatch(
+        showToastMessage({
+          message: "로그인 되었습니다.",
+          status: "success",
+        })
+      );
+
+      return user;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error);
+    }
+  }
 );
 
 export const logout = () => (dispatch) => {
@@ -135,6 +156,18 @@ const userSlice = createSlice({
       })
       .addCase(loginWithToken.fulfilled, (state, action) => {
         state.user = action.payload.user;
+      })
+      .addCase(loginWithGoogle.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(loginWithGoogle.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.loginError = null;
+      })
+      .addCase(loginWithGoogle.rejected, (state, action) => {
+        state.loading = false;
+        state.loginError = action.payload;
       });
   },
 });

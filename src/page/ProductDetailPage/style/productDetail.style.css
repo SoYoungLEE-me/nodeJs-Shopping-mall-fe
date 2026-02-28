@@ -1,13 +1,65 @@
-
-.size-drop-down{
-    width:100%;
+.product-detail-card {
+  margin-top: 60px;
+  margin-bottom: 80px; /* 🔥 하단 여백 추가 */
 }
 
-.warning-message{
-    color:red;
+/* 이미지 */
+.product-image {
+  width: 100%;
+  object-fit: cover;
 }
 
-.product-info{
-    font-size: 20px;
-    margin-bottom: 10px;
+/* 오른쪽 영역 */
+.product-info-area {
+  padding-left: 40px;
+}
+
+/* 각 정보 블록 간격 */
+.product-info {
+  margin-bottom: 18px;
+}
+
+/* 상품명 */
+.product-info:first-child {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+/* 가격 */
+.product-info:nth-child(2) {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+/* 설명 */
+.product-info:nth-child(3) {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 30px; /* 🔥 설명 아래 여백 */
+}
+
+/* 드롭다운 */
+.size-drop-down {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* 에러 메시지 */
+.warning-message {
+  color: red;
+  margin-bottom: 10px;
+}
+
+/* 버튼 */
+.add-button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+}
+
+@media screen and (max-width: 768px) {
+  .product-info-area {
+    margin-top: 30px; /* 🔥 이미지 아래 여백 */
+  }
 }

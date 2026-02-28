@@ -13,10 +13,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../features/user/userSlice";
 
 const Navbar = ({ user }) => {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
   const dispatch = useDispatch();
   const { cartItemCount } = useSelector((state) => state.cart);
   const isMobile = window.navigator.userAgent.indexOf("Mobile") !== -1;
-  const [showSearchBox, setShowSearchBox] = useState(false);
   const menuList = [
     "여성",
     "Divided",
@@ -42,26 +43,6 @@ const Navbar = ({ user }) => {
   };
   return (
     <div>
-      {showSearchBox && (
-        <div className="display-space-between mobile-search-box w-100">
-          <div className="search display-space-between w-100">
-            <div>
-              <FontAwesomeIcon className="search-icon" icon={faSearch} />
-              <input
-                type="text"
-                placeholder="제품검색"
-                onKeyPress={onCheckEnter}
-              />
-            </div>
-            <button
-              className="closebtn"
-              onClick={() => setShowSearchBox(false)}
-            >
-              &times;
-            </button>
-          </div>
-        </div>
-      )}
       <div className="side-menu" style={{ width: width }}>
         <button className="closebtn" onClick={() => setWidth(0)}>
           &times;
@@ -98,6 +79,13 @@ const Navbar = ({ user }) => {
                 {!isMobile && <span style={{ cursor: "pointer" }}>로그인</span>}
               </div>
             )}
+            <div
+              className="nav-icon search-trigger"
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+            >
+              <FontAwesomeIcon icon={faSearch} />
+              <span className="nav-text">검색</span>
+            </div>
             <div onClick={() => navigate("/cart")} className="nav-icon">
               <FontAwesomeIcon icon={faShoppingBag} />
               {!isMobile && (
@@ -113,11 +101,6 @@ const Navbar = ({ user }) => {
               <FontAwesomeIcon icon={faBox} />
               {!isMobile && <span style={{ cursor: "pointer" }}>내 주문</span>}
             </div>
-            {isMobile && (
-              <div className="nav-icon" onClick={() => setShowSearchBox(true)}>
-                <FontAwesomeIcon icon={faSearch} />
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -127,6 +110,9 @@ const Navbar = ({ user }) => {
           <img width={100} src="/image/hm-logo.png" alt="hm-logo.png" />
         </Link>
       </div>
+      <div className={`nav-search-bar ${isSearchOpen ? "open" : ""}`}>
+        <input type="text" placeholder="제품검색" onKeyDown={onCheckEnter} />
+      </div>
       <div className="nav-menu-area">
         <ul className="menu">
           {menuList.map((menu, index) => (
@@ -135,16 +121,6 @@ const Navbar = ({ user }) => {
             </li>
           ))}
         </ul>
-        {!isMobile && ( // admin페이지에서 같은 search-box스타일을 쓰고있음 그래서 여기서 서치박스 안보이는것 처리를 해줌
-          <div className="search-box landing-search-box ">
-            <FontAwesomeIcon icon={faSearch} />
-            <input
-              type="text"
-              placeholder="제품검색"
-              onKeyPress={onCheckEnter}
-            />
-          </div>
-        )}
       </div>
     </div>
   );

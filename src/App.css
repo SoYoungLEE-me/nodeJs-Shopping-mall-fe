@@ -40,10 +40,36 @@ body {
   margin-left: 20px;
 }
 
-.landing-search-box {
-  right: 20px;
-  position: absolute;
+.nav-search-bar {
+  width: 100%;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  background: #faf9f8;
 }
+
+.nav-search-bar.open {
+  max-height: 80px;
+  padding: 15px 0;
+  margin-bottom: 50px;
+}
+
+.nav-search-bar input {
+  width: 60%;
+  max-width: 500px;
+  padding: 10px 15px;
+  border: none;
+  border-bottom: 2px solid black;
+  background: transparent;
+  font-size: 16px;
+}
+
+.nav-search-bar input:focus {
+  outline: none;
+}
+
 .sidebar {
   max-width: 500px;
 }
@@ -80,15 +106,17 @@ body {
 .search input:focus {
   outline: none;
 }
-.mobile-search-box .closebtn {
-  font-size: 36px;
-  border: none;
-  background: none;
-  padding-right: 30px;
-}
+
 .card {
-  border: none !important;
-  margin-bottom: 10px;
+  border: 1px solid #e5e5e5;
+  border-radius: 16px;
+  background-color: white;
+  overflow: hidden; /* radius 적용 위해 중요 */
+  margin-bottom: 24px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .choice {
@@ -121,9 +149,40 @@ body {
 }
 
 .card:hover {
-  transform: scale(1.1);
-  z-index: 1;
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
 }
+
+.card-img-wrapper {
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+}
+
+.card-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .card-img-wrapper img {
+  transform: scale(1.05);
+}
+
+.card-body {
+  padding: 16px;
+}
+
+.card-body div:first-child {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.card-body div:last-child {
+  font-weight: 700;
+}
+
 .hide {
   visibility: hidden;
 }
@@ -259,4 +318,10 @@ body {
   justify-content: flex-end;
   margin-top: 20px;
   margin-right: 20px;
+}
+
+@media screen and (max-width: 768px) {
+  .nav-search-bar input {
+    width: 85%;
+  }
 }
