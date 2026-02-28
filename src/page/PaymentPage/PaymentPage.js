@@ -19,7 +19,12 @@ const PaymentPage = () => {
     name: "",
     number: "",
   });
+
+  const [couponCode, setCouponCode] = useState("");
+  const [couponError, setCouponError] = useState("");
+
   const navigate = useNavigate();
+
   const [firstLoading, setFirstLoading] = useState(true);
   const [shipInfo, setShipInfo] = useState({
     firstName: "",
@@ -57,6 +62,10 @@ const PaymentPage = () => {
       return;
     }
 
+    if (!validateCoupon(couponCode)) {
+      return;
+    }
+
     const { firstName, lastName, contact, address, city, zip } = shipInfo;
 
     if (!firstName || !lastName || !contact || !address || !city || !zip) {
@@ -73,6 +82,7 @@ const PaymentPage = () => {
       dispatch(
         createOrder({
           totalPrice,
+          couponCode,
           shipTo: { firstName, lastName, contact, address, city, zip },
           contact: { firstName, lastName, contact },
           orderList: cartList.map((item) => {
@@ -120,9 +130,22 @@ const PaymentPage = () => {
   const handleInputFocus = (e) => {
     setCardValue({ ...cardValue, focus: e.target.name });
   };
-  // if (cartList?.length === 0) {
-  //   navigate("/cart");
-  // }// 주문할 아이템이 없다면 주문하기로 안넘어가게 막음
+
+  const validateCoupon = (code) => {
+    if (!code) {
+      setCouponError("");
+      return true;
+    }
+
+    if (code === "WELCOME10" || code === "THANKYOU") {
+      setCouponError("");
+      return true;
+    }
+
+    setCouponError("유효하지 않은 쿠폰입니다.");
+    return false;
+  };
+
   return (
     <Container>
       <Row>
@@ -191,9 +214,34 @@ const PaymentPage = () => {
                       name="zip"
                     />
                   </Form.Group>
+
+                  <Form.Group className="mt-4">
+                    <Form.Label>쿠폰 코드</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="쿠폰 코드를 입력하세요"
+                      value={couponCode}
+                      onChange={(e) => {
+                        const value = e.target.value.trim();
+                        setCouponCode(value);
+                        validateCoupon(value);
+                      }}
+                      isInvalid={!!couponError}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {couponError}
+                    </Form.Control.Feedback>
+                    <Form.Text className="text-muted">
+                      사용 가능한 쿠폰 코드: <strong>THANKYOU</strong>
+                    </Form.Text>
+                  </Form.Group>
                 </Row>
                 <div className="mobile-receipt-area">
-                  <OrderReceipt totalPrice={totalPrice} cartList={cartList} />
+                  <OrderReceipt
+                    totalPrice={totalPrice}
+                    cartList={cartList}
+                    couponCode={couponCode}
+                  />
                 </div>
                 <div>
                   <h2 className="payment-title">결제 정보</h2>
@@ -208,6 +256,7 @@ const PaymentPage = () => {
                   variant="dark"
                   className="payment-button pay-button"
                   type="submit"
+                  disabled={!!couponError}
                 >
                   결제하기
                 </Button>
@@ -216,7 +265,11 @@ const PaymentPage = () => {
           </div>
         </Col>
         <Col lg={5} className="receipt-area">
-          <OrderReceipt totalPrice={totalPrice} cartList={cartList} />
+          <OrderReceipt
+            totalPrice={totalPrice}
+            cartList={cartList}
+            couponCode={couponCode}
+          />
         </Col>
       </Row>
     </Container>

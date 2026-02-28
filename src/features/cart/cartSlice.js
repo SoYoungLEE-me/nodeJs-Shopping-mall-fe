@@ -18,10 +18,6 @@ export const addToCart = createAsyncThunk(
     try {
       const response = await api.post("/cart", { productId: id, size, qty: 1 });
 
-      if (response.status !== 200) {
-        throw new Error(response.error);
-      }
-
       dispatch(
         showToastMessage({ message: "카트 추가 완료", status: "success" })
       );
@@ -45,10 +41,6 @@ export const getCartList = createAsyncThunk(
     try {
       const response = await api.get("/cart");
 
-      if (response.status !== 200) {
-        throw new Error(response.error);
-      }
-
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || error.message);
@@ -61,10 +53,6 @@ export const deleteCartItem = createAsyncThunk(
   async (id, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.delete(`/cart/${id}`);
-
-      if (response.status !== 200) {
-        throw new Error(response.error);
-      }
 
       dispatch(
         showToastMessage({
@@ -90,10 +78,6 @@ export const updateQty = createAsyncThunk(
     try {
       const response = await api.put(`/cart/${id}`, { qty: value });
 
-      if (response.status !== 200) {
-        throw new Error(response.error);
-      }
-
       dispatch(getCartList());
 
       return { id, qty: value };
@@ -112,10 +96,6 @@ export const getCartQty = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get("/cart");
-
-      if (response.status !== 200) {
-        throw new Error(response.error);
-      }
 
       return response.data.data.length;
     } catch (error) {

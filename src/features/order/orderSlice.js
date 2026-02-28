@@ -104,6 +104,32 @@ export const updateOrder = createAsyncThunk(
   }
 );
 
+export const cancelOrder = createAsyncThunk(
+  "order/cancelOrder",
+  async (id, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await api.put(`/order/${id}/cancel`);
+
+      if (response.status !== 200) {
+        throw new Error("주문 취소 실패");
+      }
+
+      dispatch(
+        showToastMessage({
+          message: "주문이 취소되었습니다.",
+          status: "success",
+        })
+      );
+
+      dispatch(getOrder());
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.error || "주문 취소 실패");
+    }
+  }
+);
+
 // Order slice
 const orderSlice = createSlice({
   name: "order",
@@ -148,6 +174,17 @@ const orderSlice = createSlice({
         state.totalPageNum = action.payload.totalPageNum;
       })
       .addCase(getOrderList.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(cancelOrder.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(cancelOrder.fulfilled, (state) => {
+        state.loading = false;
+        state.error = "";
+      })
+      .addCase(cancelOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

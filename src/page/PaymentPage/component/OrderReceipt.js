@@ -4,9 +4,26 @@ import { useNavigate } from "react-router";
 import { useLocation } from "react-router-dom";
 import { currencyFormat } from "../../../utils/number";
 
-const OrderReceipt = ({ totalPrice, cartList = [], hasStockIssue }) => {
+const OrderReceipt = ({
+  totalPrice,
+  cartList = [],
+  hasStockIssue,
+  couponCode, // optional
+}) => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  let discount = 0;
+
+  if (couponCode) {
+    if (couponCode === "WELCOME10") {
+      discount = totalPrice * 0.1;
+    } else if (couponCode === "THANKYOU") {
+      discount = 5000;
+    }
+  }
+
+  const finalPrice = totalPrice - discount;
 
   return (
     <div className="receipt-container">
@@ -46,6 +63,24 @@ const OrderReceipt = ({ totalPrice, cartList = [], hasStockIssue }) => {
         </div>
       </div>
 
+      {couponCode && discount > 0 && (
+        <>
+          <div className="display-flex space-between text-success">
+            <div>쿠폰 할인</div>
+            <div>- ₩ {currencyFormat(discount)}</div>
+          </div>
+
+          <div className="display-flex space-between receipt-title">
+            <div>
+              <strong>최종 결제금액:</strong>
+            </div>
+            <div>
+              <strong>₩ {currencyFormat(finalPrice)}</strong>
+            </div>
+          </div>
+        </>
+      )}
+
       {location.pathname.includes("/cart") && cartList.length > 0 && (
         <>
           {hasStockIssue && (
@@ -68,10 +103,6 @@ const OrderReceipt = ({ totalPrice, cartList = [], hasStockIssue }) => {
       <div>
         가능한 결제 수단 귀하가 결제 단계에 도달할 때까지 가격 및 배송료는
         확인되지 않습니다.
-        <div>
-          30일의 반품 가능 기간, 반품 수수료 및 미수취시 발생하는 추가 배송 요금
-          읽어보기 반품 및 환불
-        </div>
       </div>
     </div>
   );

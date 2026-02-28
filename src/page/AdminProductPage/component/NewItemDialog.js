@@ -31,14 +31,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
   );
   const [stock, setStock] = useState([]);
   const dispatch = useDispatch();
-  const [stockError, setStockError] = useState(false);
-
-  useEffect(() => {
-    if (success) {
-      setShowDialog(false);
-      dispatch(getProductList());
-    }
-  }, [success]);
+  const [stockError, setStockError] = useState("");
 
   useEffect(() => {
     if (error || !success) {
@@ -68,35 +61,49 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    //재고를 입력했는지 확인, 아니면 에러
+
+    setStockError(""); // 🔥 제출할 때 초기화
 
     if (stock.length === 0) {
-      return setStockError(true);
-    }
-
-    if (stock.some((item) => Number(item[1]) < 0)) {
-      setStockError(true);
+      setStockError("재고를 최소 1개 이상 추가해주세요.");
       return;
     }
 
-    // 재고를 배열에서 객체로 바꿔주기
+    if (stock.some((item) => !item[0])) {
+      setStockError("사이즈를 선택해주세요.");
+      return;
+    }
+
+    if (stock.some((item) => Number(item[1]) <= 0)) {
+      setStockError("재고 수량은 1 이상이어야 합니다.");
+      return;
+    }
+
     const totalStock = stock.reduce((total, item) => {
       return { ...total, [item[0]]: parseInt(item[1]) };
     }, {});
 
-    console.log("formdata", formData);
-    console.log("totalStock", totalStock);
-
-    // [['M',2]] 에서 {M:2}로
-
     if (mode === "new") {
-      dispatch(createProduct({ ...formData, stock: totalStock }));
+      dispatch(createProduct({ ...formData, stock: totalStock }))
+        .unwrap()
+        .then(() => {
+          setShowDialog(false);
+        })
+        .catch(() => {
+          // 서버 에러는 redux error로 표시됨
+        });
     } else {
-      //상품 수정하기
       dispatch(
-        editProduct({ ...formData, stock: totalStock, id: selectedProduct._id })
-      );
-      setShowDialog(false);
+        editProduct({
+          ...formData,
+          stock: totalStock,
+          id: selectedProduct._id,
+        })
+      )
+        .unwrap()
+        .then(() => {
+          setShowDialog(false);
+        });
     }
   };
 
@@ -216,9 +223,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
 
         <Form.Group className="mb-3" controlId="stock">
           <Form.Label className="mr-1">Stock</Form.Label>
-          {stockError && (
-            <span className="error-message">재고를 추가해주세요</span>
-          )}
+          {stockError && <div className="error-message mt-1">{stockError}</div>}
           <Button size="sm" onClick={addStock}>
             Add +
           </Button>
